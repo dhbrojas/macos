@@ -98,3 +98,4 @@ Automated tools, or myself may produce edits to the document while you are activ
 # Notes
 
 - When writing tentative document outlines, DO NOT display the outline in the conversation. Directly write the outline to a file using the `Write` tool.
+- When replacing placeholder text with the final text, DO NOT display the final text in the conversation. Directly write the final text to the file using the `Edit` tool.
