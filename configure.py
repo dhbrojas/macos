@@ -15,9 +15,9 @@ subprocess.run(["git", "config", "--global", "rebase.autostash", "true"], check=
 print("Configured git settings.")
 
 for skill in Path("skills").iterdir():
-    shutil.copytree(skill, HOME / ".codex" / "skills" / skill.name)
+    shutil.copytree(skill, HOME / ".codex" / "skills" / skill.name, dirs_exist_ok=True)
 print("Imported agent skills into Codex.")
 
 for skill in Path("skills").iterdir():
-    shutil.copytree(skill, HOME / ".claude" / "skills" / skill.name)
+    shutil.copytree(skill, HOME / ".claude" / "skills" / skill.name, dirs_exist_ok=True)
 print("Imported agent skills into Claude Code.")
