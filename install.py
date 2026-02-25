@@ -1,25 +1,18 @@
-import subprocess
+import os
 import shutil
+import subprocess
 import sys
 import time
-import os
-from pathlib import Path
 from abc import ABC, abstractmethod
+from pathlib import Path
 
-
-def refresh():
-    shell = os.environ.get("SHELL", "/bin/zsh")
-    try:
-        result = subprocess.check_output([shell, "-lc", "echo $PATH"], text=True).strip()
-        if result:
-            os.environ["PATH"] = result
-    except (OSError, subprocess.CalledProcessError) as e:
-        print(f"WARN: Failed to refresh PATH: {e}")
+from utils import PATH
 
 
 class Item(ABC):
-    def __init__(self, name: str):
+    def __init__(self, name, hooks = None):
         self.name = name
+        self.hooks = hooks or []
 
     @abstractmethod
     def is_installed(self) -> bool:
@@ -30,8 +23,8 @@ class Item(ABC):
 
 
 class BrewPackage(Item):
-    def __init__(self, name: str, slug: str, *, version: str = None, cask: bool = False):
-        super().__init__(name)
+    def __init__(self, name, slug, *, version = None, cask = False, hooks = None):
+        super().__init__(name, hooks)
         self.slug = slug
         self.version = version
         self.cask = cask
@@ -56,8 +49,16 @@ class BrewPackage(Item):
 
 
 class PipeBashCommand(Item):
-    def __init__(self, name: str, command: str, interactive: bool = False, which: str = None, stat: str = None):
-        super().__init__(name)
+    def __init__(
+        self,
+        name,
+        command,
+        interactive = False,
+        which = None,
+        stat = None,
+        hooks = None
+    ):
+        super().__init__(name, hooks)
         self.command = command
         self.interactive = interactive
         self.which = which
@@ -76,8 +77,14 @@ class PipeBashCommand(Item):
 
 
 items = [
-    PipeBashCommand("Homebrew", "curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | sh", which="brew"),
-    PipeBashCommand("Oh My ZSH", "curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh", stat="~/.oh-my-zsh"),
+    PipeBashCommand(
+        "Homebrew", "curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | sh", which="brew"
+    ),
+    PipeBashCommand(
+        "Oh My ZSH",
+        "curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh",
+        stat="~/.oh-my-zsh",
+    ),
     BrewPackage("Ghostty", "ghostty", cask=True),
     BrewPackage("Spotify", "spotify", cask=True),
     BrewPackage("Feishu", "feishu", cask=True),
@@ -85,13 +92,24 @@ items = [
     BrewPackage("WeChat", "wechat", cask=True),
     BrewPackage("Slack", "slack", cask=True),
     BrewPackage("Discord", "discord", cask=True),
+    BrewPackage("Cursor", "cursor", cask=True),
     BrewPackage("Golang", "go"),
     BrewPackage("Infisical", "infisical/get-cli/infisical"),
     BrewPackage("UV", "uv"),
-    PipeBashCommand("Rust", "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh", interactive=True, which="cargo"),
-    PipeBashCommand("Claude Code", "curl -fsSL https://claude.ai/install.sh | sh", interactive=True, which="claude"),
-    PipeBashCommand("Bun", "curl -fsSL https://bun.com/install | sh", interactive=True, which="bun")
+    PipeBashCommand(
+        "Rust", "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh", interactive=True, which="cargo"
+    ),
+    PipeBashCommand(
+        "Claude Code",
+        "curl -fsSL https://claude.ai/install.sh | sh",
+        interactive=True,
+        which="claude",
+        hooks=[PATH.ensure(Path.home() / ".local" / "bin")],
+    ),
+    PipeBashCommand("Bun", "curl -fsSL https://bun.com/install | sh", interactive=True, which="bun"),
 ]
+
+PATH.refresh()
 
 for item in items:
     if len(sys.argv) > 1:
@@ -106,7 +124,8 @@ for item in items:
         try:
             s = time.time()
             item.install()
+            [hook() for hook in item.hooks]
             print(f"Target '{item.name}' installed in {time.time() - s:.2f}s.")
-            refresh()
+            PATH.refresh()
         except subprocess.CalledProcessError as e:
             print(f"ERR! Failed to install {item.name}: {e}")
