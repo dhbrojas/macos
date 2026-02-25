@@ -35,6 +35,10 @@ Long names are a smell. A name should be as short as it can be while remaining u
 
 A comment that restates what the code does is worthless — the code already says that. A comment is valuable only when it captures something the code cannot: why a decision was made, a constraint being respected, a tradeoff accepted, an edge case that isn't obvious. Default to no comment. Add one only when the reasoning would otherwise be lost.
 
+## Organize Code Efficiently
+
+Sometimes the right refactor is just moving things to where they belong. Each file, package, or module should have a clear, single responsibility. Anything that doesn't fit that responsibility should live elsewhere. Go's standard library is a good model: small, focused packages with minimal cross-dependencies, each named after what it provides. Mixing unrelated concerns into the same module because it's convenient is a form of clutter.
+
 # Capabilities
 
 ## Starting Up
