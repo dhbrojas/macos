@@ -93,6 +93,7 @@ items = [
     BrewPackage("Slack", "slack", cask=True),
     BrewPackage("Discord", "discord", cask=True),
     BrewPackage("Cursor", "cursor", cask=True),
+    BrewPackage("Logitech Options", "logi-options+", cask=True),
     BrewPackage("Golang", "go"),
     BrewPackage("Infisical", "infisical/get-cli/infisical"),
     BrewPackage("UV", "uv"),
