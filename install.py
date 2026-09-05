@@ -10,7 +10,7 @@ from utils import PATH
 
 
 class Item(ABC):
-    def __init__(self, name, hooks = None):
+    def __init__(self, name, hooks=None):
         self.name = name
         self.hooks = hooks or []
 
@@ -23,7 +23,7 @@ class Item(ABC):
 
 
 class BrewPackage(Item):
-    def __init__(self, name, slug, *, version = None, cask = False, hooks = None):
+    def __init__(self, name, slug, *, version=None, cask=False, hooks=None):
         super().__init__(name, hooks)
         self.slug = slug
         self.version = version
@@ -49,15 +49,7 @@ class BrewPackage(Item):
 
 
 class PipeBashCommand(Item):
-    def __init__(
-        self,
-        name,
-        command,
-        interactive = False,
-        which = None,
-        stat = None,
-        hooks = None
-    ):
+    def __init__(self, name, command, interactive=False, which=None, stat=None, hooks=None):
         super().__init__(name, hooks)
         self.command = command
         self.interactive = interactive
@@ -78,26 +70,25 @@ class PipeBashCommand(Item):
 
 items = [
     PipeBashCommand(
-        "Homebrew", "curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | sh", which="brew"
+        "Homebrew", "curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash", which="brew"
     ),
     PipeBashCommand(
         "Oh My ZSH",
-        "curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh",
+        "curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | bash",
         stat="~/.oh-my-zsh",
     ),
     BrewPackage("Ghostty", "ghostty", cask=True),
     BrewPackage("Spotify", "spotify", cask=True),
-    BrewPackage("Feishu", "feishu", cask=True),
     BrewPackage("Docker", "docker", cask=True),
-    BrewPackage("WeChat", "wechat", cask=True),
+    # BrewPackage("Feishu", "feishu", cask=True),
+    # BrewPackage("WeChat", "wechat", cask=True),
+    # BrewPackage("Discord", "discord", cask=True),
+    # BrewPackage("Infisical", "infisical/get-cli/infisical"),
     BrewPackage("Slack", "slack", cask=True),
-    BrewPackage("Discord", "discord", cask=True),
-    BrewPackage("Cursor", "cursor", cask=True),
-    BrewPackage("Wispr Flow", "wispr-flow", cask=True),
     BrewPackage("Logitech Options", "logi-options+", cask=True),
     BrewPackage("Golang", "go"),
-    BrewPackage("Infisical", "infisical/get-cli/infisical"),
     BrewPackage("UV", "uv"),
+    BrewPackage("Zed", "zed", cask=True),
     PipeBashCommand(
         "Rust", "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh", interactive=True, which="cargo"
     ),
